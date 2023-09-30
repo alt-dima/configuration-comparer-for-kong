@@ -1,9 +1,9 @@
-# kong-configuration-comparer
+# Configuration comparer for Kong API Gateway
 Simple Go application to compare two Kong configurations via Go bindings for Kong's Admin API.
 
 **Written for learing Go (it means, the code is very ugly)** and demonstrate how to use Go bindings for Kong's Admin API (`github.com/kong/go-kong`)
 
-Application compare configuration tree one Kong to another ignoring different IDs of the resources.
+Application compare configuration tree one Kong API Gateway to another ignoring different IDs of the resources.
 
 - Routes (it search routes in the second Kong by all the pathes in the Route of the original Kong)
     - Route configuration (Preserve Host, Strip Path should be the same)
@@ -19,11 +19,11 @@ Plugins configuration comparsion works very primitive (comparing of JSON of the 
 
 ## Build
 
-`go build -o kongcomparer`
+`go build -o configuration-comparer`
 
 ## Use
 
-`./kongcomparer https://kong-admin-api.example.com   https://kong-admin-api.example2.com`
+`./configuration-comparer https://kong-admin-api.example.com   https://kong-admin-api.example2.com`
 
 Example output:
 ```
@@ -42,12 +42,11 @@ Consumer bvnvbnvbn@example.com does not exists in https://kong-admin-api.example
 Consumer adfadf@example.com does not exists in https://kong-admin-api.example2.com
 ```
 
-
 ## Compatibility
 
-`kong-configuration-comparer` is compatible the same as `github.com/kong/go-kong` module (currently with with Kong 2.x and 3.x.)
+`configuration-comparer-for-kong` is compatible the same as `github.com/kong/go-kong` module (currently with with Kong 2.x and 3.x.)
 
 ## License
 
-kong-configuration-comparer is licensed with Apache License Version 2.0.
+`configuration-comparer-for-kong` is licensed with Apache License Version 2.0.
 Please read the LICENSE file for more details.
