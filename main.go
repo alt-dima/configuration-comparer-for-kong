@@ -227,4 +227,56 @@ func main() {
 		}
 	}
 
+	//compare global plugins
+	allPluginsClient1, err := client1.Plugins.ListAll(nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var allGlobalPluginsClient1 []*kong.Plugin
+
+	for _, PluginClient1 := range allPluginsClient1 {
+		if PluginClient1.Route == nil && PluginClient1.Service == nil && PluginClient1.Consumer == nil {
+			allGlobalPluginsClient1 = append(allGlobalPluginsClient1, PluginClient1)
+		}
+	}
+
+	allPluginsClient2, err := client2.Plugins.ListAll(nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var allGlobalPluginsClient2 []*kong.Plugin
+
+	for _, PluginClient2 := range allPluginsClient2 {
+		if PluginClient2.Route == nil && PluginClient2.Service == nil && PluginClient2.Consumer == nil {
+			allGlobalPluginsClient2 = append(allGlobalPluginsClient2, PluginClient2)
+		}
+	}
+
+	fmt.Printf("Amount global plugins in %v: %v \n", *clientUrl1, len(allGlobalPluginsClient1))
+	fmt.Printf("Amount global plugins in %v: %v \n", *clientUrl2, len(allGlobalPluginsClient2))
+
+	for _, globalPluginClient1 := range allGlobalPluginsClient1 {
+		result := false
+
+		for _, globalPluginClient2 := range allGlobalPluginsClient2 {
+			if *globalPluginClient1.Name == *globalPluginClient2.Name && *globalPluginClient1.Enabled == *globalPluginClient2.Enabled {
+				result = true
+				delete(globalPluginClient1.Config, "anonymous")
+				delete(globalPluginClient2.Config, "anonymous")
+				delete(globalPluginClient1.Config, "okta_consumer")
+				delete(globalPluginClient2.Config, "okta_consumer")
+				if !reflect.DeepEqual(globalPluginClient1.Config, globalPluginClient2.Config) {
+					//fmt.Println(pluginRouteClient1.Config)
+					//fmt.Println(pluginRouteClient2.Config)
+					fmt.Println("Global plugin config " + *globalPluginClient1.Name + " not equals in " + *clientUrl2)
+				}
+				break
+			}
+		}
+		if result == false {
+			fmt.Println("Global plugin " + *globalPluginClient1.Name + " does not exists in " + *clientUrl2)
+		}
+	}
 }
