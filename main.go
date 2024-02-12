@@ -219,6 +219,30 @@ func main() {
 						fmt.Println("Consumer " + *client1Consumer.Username + " plugin " + *pluginConsumerClient1.Name + " does not exists in " + *clientUrl2)
 					}
 				}
+
+				//check consumer ACLs
+				allACLsConsumerClient1, _, err := client1.ACLs.ListForConsumer(nil, client1Consumer.ID, nil)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				allACLsConsumerClient2, _, err := client2.ACLs.ListForConsumer(nil, client2Consumer.ID, nil)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				for _, aclConsumerClient1 := range allACLsConsumerClient1 {
+					result := false
+
+					for _, aclConsumerClient2 := range allACLsConsumerClient2 {
+						if *aclConsumerClient1.Group == *aclConsumerClient2.Group && *aclConsumerClient1.ID == *aclConsumerClient2.ID {
+							result = true
+
+							break
+						}
+					}
+					if result == false {
+						fmt.Println("Consumer " + *client1Consumer.Username + " ACL " + *aclConsumerClient1.Group + " does not exists in " + *clientUrl2)
+					}
+				}
 				break
 			}
 		}
@@ -279,4 +303,56 @@ func main() {
 			fmt.Println("Global plugin " + *globalPluginClient1.Name + " does not exists in " + *clientUrl2)
 		}
 	}
+
+	// //compare consumer groups
+	// allConsGroupsClient1, err := client1.ConsumerGroups.ListAll(nil)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// allConsGroupsClient2, err := client2.ConsumerGroups.ListAll(nil)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// fmt.Printf("Amount consumer groups in %v: %v \n", *clientUrl1, len(allConsGroupsClient1))
+	// fmt.Printf("Amount consumer groups in %v: %v \n", *clientUrl2, len(allConsGroupsClient2))
+
+	// for _, consGroupClient1 := range allConsGroupsClient1 {
+	// 	result := false
+
+	// 	for _, consGroupClient2 := range allConsGroupsClient2 {
+	// 		if *consGroupClient1.Name == *consGroupClient2.Name && *consGroupClient1.ID == *consGroupClient1.ID {
+	// 			result = true
+
+	// 			//check consumer plugins
+	// 			consumersGroupClient1, err := client1.ConsumerGroupConsumers.ListAll(nil, consGroupClient1.ID)
+	// 			if err != nil {
+	// 				log.Fatalln(err)
+	// 			}
+	// 			consumersGroupClient2, err := client2.ConsumerGroupConsumers.ListAll(nil, consGroupClient2.ID)
+	// 			if err != nil {
+	// 				log.Fatalln(err)
+	// 			}
+	// 			for _, groupConsumerClient1 := range consumersGroupClient1.Consumers {
+	// 				result := false
+
+	// 				for _, groupConsumerClient2 := range consumersGroupClient2.Consumers {
+	// 					if *groupConsumerClient1.Username == *groupConsumerClient2.Username && *groupConsumerClient1.ID == *groupConsumerClient2.ID {
+	// 						result = true
+
+	// 						break
+	// 					}
+	// 				}
+	// 				if result == false {
+	// 					fmt.Println("Consumer " + *consGroupClient1.Name + " plugin " + *groupConsumerClient1.Username + " does not exists in " + *clientUrl2)
+	// 				}
+	// 			}
+	// 			break
+	// 		}
+	// 	}
+	// 	if result == false {
+	// 		fmt.Println("Cons Group " + *consGroupClient1.Name + " does not exists in " + *clientUrl2)
+	// 	}
+	// }
 }
