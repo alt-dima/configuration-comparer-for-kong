@@ -177,7 +177,7 @@ func main() {
 	fmt.Printf("Amount consumers in %v: %v \n", *clientUrl1, len(allConsumersClient1))
 	fmt.Printf("Amount consumers in %v: %v \n", *clientUrl2, len(allConsumersClient2))
 
-	fmt.Printf("Consumers credentials comparing not implemented!!! \n")
+	fmt.Printf("Only Consumers plugins and ACLs comparison currently implemented!!! \n")
 
 	for _, client1Consumer := range allConsumersClient1 {
 		result := false
@@ -233,7 +233,7 @@ func main() {
 					result := false
 
 					for _, aclConsumerClient2 := range allACLsConsumerClient2 {
-						if *aclConsumerClient1.Group == *aclConsumerClient2.Group && *aclConsumerClient1.ID == *aclConsumerClient2.ID {
+						if *aclConsumerClient1.Group == *aclConsumerClient2.Group {
 							result = true
 
 							break
