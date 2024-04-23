@@ -1,7 +1,7 @@
 # Configuration comparer for Kong API Gateway
 Simple Go application to compare two Kong configurations via Go bindings for Kong's Admin API.
 
-**Written for learing Go (it means, the code is very ugly)** and demonstrate how to use Go bindings for Kong's Admin API (`github.com/kong/go-kong`)
+**Written for learing Go** and demonstrate how to use Go bindings for Kong's Admin API (`github.com/kong/go-kong`)
 
 Application compare configuration tree one Kong API Gateway to another ignoring different IDs of the resources.
 
@@ -17,13 +17,9 @@ Application compare configuration tree one Kong API Gateway to another ignoring 
 
 Plugins configuration comparsion works very primitive (comparing of JSON of the config), it causes false positives in configuration mismatch because of some possible unique fields in the configs (like anonymous consumer ID), thats why I do "hardcoded things" like `delete(pluginRouteClient1.Config, "anonymous")`
 
-## Build
-
-`go build -o configuration-comparer`
-
 ## Use
 
-`./configuration-comparer https://kong-admin-api.example.com   https://kong-admin-api.example2.com`
+`./configuration-comparer-for-kong https://kong-admin-api.example.com   https://kong-admin-api.example2.com`
 
 Example output:
 ```
