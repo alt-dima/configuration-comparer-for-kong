@@ -11,6 +11,10 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+var (
+	version string = "undefined"
+)
+
 func slicePointersToValues(slicePointers []*string) []string {
 	sliceValues := make([]string, len(slicePointers))
 	for i, s := range slicePointers {
@@ -21,6 +25,12 @@ func slicePointersToValues(slicePointers []*string) []string {
 }
 
 func main() {
+	log.Printf("Comparer version: %v \n", version)
+
+	if len(os.Args) != 3 {
+		log.Fatalln("please specify url1 and url2 to compare like: " + os.Args[0] + " http://kong-adm-1 http://kong-adm-2")
+	}
+
 	clientUrl1 := &os.Args[1]
 	clientUrl2 := &os.Args[2]
 
@@ -43,8 +53,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Printf("Amount routes in %v: %v \n", *clientUrl1, len(allRoutesClient1))
-	fmt.Printf("Amount routes in %v: %v \n", *clientUrl2, len(allRoutesClient2))
+	log.Printf("Amount routes in %v: %v \n", *clientUrl1, len(allRoutesClient1))
+	log.Printf("Amount routes in %v: %v \n", *clientUrl2, len(allRoutesClient2))
 
 	for _, client1Route := range allRoutesClient1 {
 		result := false
@@ -58,19 +68,19 @@ func main() {
 				result = true
 				//checking route parameters
 				if *client1Route.PreserveHost != *client2Route.PreserveHost {
-					fmt.Printf("Route %v PreserveHost %v not equals %v \n", strClient1RoutePaths, *client1Route.PreserveHost, *client2Route.PreserveHost)
+					log.Printf("Route %v PreserveHost %v not equals %v \n", strClient1RoutePaths, *client1Route.PreserveHost, *client2Route.PreserveHost)
 				}
 				if *client1Route.StripPath != *client2Route.StripPath {
-					fmt.Printf("Route %v StripPath %v not equals %v \n", strClient1RoutePaths, *client1Route.StripPath, *client2Route.StripPath)
+					log.Printf("Route %v StripPath %v not equals %v \n", strClient1RoutePaths, *client1Route.StripPath, *client2Route.StripPath)
 				}
 				if !slices.Equal(slicePointersToValues(client1Route.Methods), slicePointersToValues(client2Route.Methods)) {
-					fmt.Printf("Route %v Methods not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v Methods not equals \n", strClient1RoutePaths)
 				}
 				if !slices.Equal(slicePointersToValues(client1Route.Hosts), slicePointersToValues(client2Route.Hosts)) {
-					fmt.Printf("Route %v Hosts not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v Hosts not equals \n", strClient1RoutePaths)
 				}
 				if !slices.Equal(slicePointersToValues(client1Route.Protocols), slicePointersToValues(client2Route.Protocols)) {
-					fmt.Printf("Route %v Protocols not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v Protocols not equals \n", strClient1RoutePaths)
 				}
 
 				//check route plugins
@@ -93,15 +103,15 @@ func main() {
 							delete(pluginRouteClient1.Config, "okta_consumer")
 							delete(pluginRouteClient2.Config, "okta_consumer")
 							if !reflect.DeepEqual(pluginRouteClient1.Config, pluginRouteClient2.Config) {
-								//fmt.Println(pluginRouteClient1.Config)
-								//fmt.Println(pluginRouteClient2.Config)
-								fmt.Println("Route " + strClient1RoutePaths + " plugin config " + *pluginRouteClient1.Name + " not equals in " + *clientUrl2)
+								//log.Println(pluginRouteClient1.Config)
+								//log.Println(pluginRouteClient2.Config)
+								log.Println("Route " + strClient1RoutePaths + " plugin config " + *pluginRouteClient1.Name + " not equals in " + *clientUrl2)
 							}
 							break
 						}
 					}
 					if result == false {
-						fmt.Println("Route " + strClient1RoutePaths + " plugin " + *pluginRouteClient1.Name + " does not exists in " + *clientUrl2)
+						log.Println("Route " + strClient1RoutePaths + " plugin " + *pluginRouteClient1.Name + " does not exists in " + *clientUrl2)
 					}
 				}
 
@@ -115,13 +125,13 @@ func main() {
 					log.Fatalln(err)
 				}
 				if *serviceRouteClient1.Host != *serviceRouteClient2.Host {
-					fmt.Printf("Route %v target service Host not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v target service Host not equals \n", strClient1RoutePaths)
 				}
 				if *serviceRouteClient1.Port != *serviceRouteClient2.Port {
-					fmt.Printf("Route %v target service Port not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v target service Port not equals \n", strClient1RoutePaths)
 				}
 				if *serviceRouteClient1.Path != *serviceRouteClient2.Path {
-					fmt.Printf("Route %v target service Path not equals \n", strClient1RoutePaths)
+					log.Printf("Route %v target service Path not equals \n", strClient1RoutePaths)
 				}
 
 				//check service plugins
@@ -144,15 +154,15 @@ func main() {
 							//delete(pluginServiceClient1.Config, "okta_consumer")
 							//delete(pluginServiceClient2.Config, "okta_consumer")
 							if !reflect.DeepEqual(pluginServiceClient1.Config, pluginServiceClient2.Config) {
-								//fmt.Println(pluginServiceClient1.Config)
-								//fmt.Println(pluginServiceClient2.Config)
-								fmt.Println("Service " + *serviceRouteClient1.Name + " plugin config " + *pluginServiceClient1.Name + " not equals in " + *clientUrl2)
+								//log.Println(pluginServiceClient1.Config)
+								//log.Println(pluginServiceClient2.Config)
+								log.Println("Service " + *serviceRouteClient1.Name + " plugin config " + *pluginServiceClient1.Name + " not equals in " + *clientUrl2)
 							}
 							break
 						}
 					}
 					if result == false {
-						fmt.Println("Route " + strClient1RoutePaths + " plugin " + *pluginServiceClient1.Name + " does not exists in " + *clientUrl2)
+						log.Println("Route " + strClient1RoutePaths + " plugin " + *pluginServiceClient1.Name + " does not exists in " + *clientUrl2)
 					}
 				}
 
@@ -160,7 +170,7 @@ func main() {
 			}
 		}
 		if result == false {
-			fmt.Println("Route " + strClient1RoutePaths + " does not exists in " + *clientUrl2)
+			log.Println("Route " + strClient1RoutePaths + " does not exists in " + *clientUrl2)
 		}
 	}
 
@@ -174,10 +184,10 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Printf("Amount consumers in %v: %v \n", *clientUrl1, len(allConsumersClient1))
-	fmt.Printf("Amount consumers in %v: %v \n", *clientUrl2, len(allConsumersClient2))
+	log.Printf("Amount consumers in %v: %v \n", *clientUrl1, len(allConsumersClient1))
+	log.Printf("Amount consumers in %v: %v \n", *clientUrl2, len(allConsumersClient2))
 
-	fmt.Printf("Only Consumers plugins and ACLs comparison currently implemented!!! \n")
+	log.Printf("Only Consumers plugins and ACLs comparison currently implemented!!! \n")
 
 	for _, client1Consumer := range allConsumersClient1 {
 		result := false
@@ -202,21 +212,21 @@ func main() {
 					for _, pluginConsumerClient2 := range allPluginsConsumerClient2 {
 						if *pluginConsumerClient1.Name == *pluginConsumerClient2.Name && *pluginConsumerClient1.Enabled == *pluginConsumerClient2.Enabled {
 							result = true
-							//fmt.Println(pluginConsumerClient1.Config)
+							//log.Println(pluginConsumerClient1.Config)
 							//delete(pluginConsumerClient1.Config, "append")
 							//delete(pluginConsumerClient2.Config, "append")
 							//delete(pluginConsumerClient1.Config, "okta_consumer")
 							//delete(pluginConsumerClient2.Config, "okta_consumer")
 							if !reflect.DeepEqual(pluginConsumerClient1.Config, pluginConsumerClient2.Config) {
-								//fmt.Println(pluginConsumerClient1.Config)
-								//fmt.Println(pluginConsumerClient2.Config)
-								fmt.Println("Consumer " + *client1Consumer.Username + " plugin config " + *pluginConsumerClient1.Name + " not equals in " + *clientUrl2)
+								//log.Println(pluginConsumerClient1.Config)
+								//log.Println(pluginConsumerClient2.Config)
+								log.Println("Consumer " + *client1Consumer.Username + " plugin config " + *pluginConsumerClient1.Name + " not equals in " + *clientUrl2)
 							}
 							break
 						}
 					}
 					if result == false {
-						fmt.Println("Consumer " + *client1Consumer.Username + " plugin " + *pluginConsumerClient1.Name + " does not exists in " + *clientUrl2)
+						log.Println("Consumer " + *client1Consumer.Username + " plugin " + *pluginConsumerClient1.Name + " does not exists in " + *clientUrl2)
 					}
 				}
 
@@ -240,14 +250,14 @@ func main() {
 						}
 					}
 					if result == false {
-						fmt.Println("Consumer " + *client1Consumer.Username + " ACL " + *aclConsumerClient1.Group + " does not exists in " + *clientUrl2)
+						log.Println("Consumer " + *client1Consumer.Username + " ACL " + *aclConsumerClient1.Group + " does not exists in " + *clientUrl2)
 					}
 				}
 				break
 			}
 		}
 		if result == false {
-			fmt.Println("Consumer " + *client1Consumer.Username + " does not exists in " + *clientUrl2)
+			log.Println("Consumer " + *client1Consumer.Username + " does not exists in " + *clientUrl2)
 		}
 	}
 
@@ -278,8 +288,8 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Amount global plugins in %v: %v \n", *clientUrl1, len(allGlobalPluginsClient1))
-	fmt.Printf("Amount global plugins in %v: %v \n", *clientUrl2, len(allGlobalPluginsClient2))
+	log.Printf("Amount global plugins in %v: %v \n", *clientUrl1, len(allGlobalPluginsClient1))
+	log.Printf("Amount global plugins in %v: %v \n", *clientUrl2, len(allGlobalPluginsClient2))
 
 	for _, globalPluginClient1 := range allGlobalPluginsClient1 {
 		result := false
@@ -292,15 +302,15 @@ func main() {
 				delete(globalPluginClient1.Config, "okta_consumer")
 				delete(globalPluginClient2.Config, "okta_consumer")
 				if !reflect.DeepEqual(globalPluginClient1.Config, globalPluginClient2.Config) {
-					//fmt.Println(pluginRouteClient1.Config)
-					//fmt.Println(pluginRouteClient2.Config)
-					fmt.Println("Global plugin config " + *globalPluginClient1.Name + " not equals in " + *clientUrl2)
+					//log.Println(pluginRouteClient1.Config)
+					//log.Println(pluginRouteClient2.Config)
+					log.Println("Global plugin config " + *globalPluginClient1.Name + " not equals in " + *clientUrl2)
 				}
 				break
 			}
 		}
 		if result == false {
-			fmt.Println("Global plugin " + *globalPluginClient1.Name + " does not exists in " + *clientUrl2)
+			log.Println("Global plugin " + *globalPluginClient1.Name + " does not exists in " + *clientUrl2)
 		}
 	}
 
@@ -315,8 +325,8 @@ func main() {
 	// 	log.Fatalln(err)
 	// }
 
-	// fmt.Printf("Amount consumer groups in %v: %v \n", *clientUrl1, len(allConsGroupsClient1))
-	// fmt.Printf("Amount consumer groups in %v: %v \n", *clientUrl2, len(allConsGroupsClient2))
+	// log.Printf("Amount consumer groups in %v: %v \n", *clientUrl1, len(allConsGroupsClient1))
+	// log.Printf("Amount consumer groups in %v: %v \n", *clientUrl2, len(allConsGroupsClient2))
 
 	// for _, consGroupClient1 := range allConsGroupsClient1 {
 	// 	result := false
@@ -345,14 +355,14 @@ func main() {
 	// 					}
 	// 				}
 	// 				if result == false {
-	// 					fmt.Println("Consumer " + *consGroupClient1.Name + " plugin " + *groupConsumerClient1.Username + " does not exists in " + *clientUrl2)
+	// 					log.Println("Consumer " + *consGroupClient1.Name + " plugin " + *groupConsumerClient1.Username + " does not exists in " + *clientUrl2)
 	// 				}
 	// 			}
 	// 			break
 	// 		}
 	// 	}
 	// 	if result == false {
-	// 		fmt.Println("Cons Group " + *consGroupClient1.Name + " does not exists in " + *clientUrl2)
+	// 		log.Println("Cons Group " + *consGroupClient1.Name + " does not exists in " + *clientUrl2)
 	// 	}
 	// }
 }
