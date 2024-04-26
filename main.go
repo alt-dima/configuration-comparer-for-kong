@@ -60,11 +60,12 @@ func main() {
 		result := false
 
 		client1RoutePaths := slicePointersToValues(client1Route.Paths)
+		client1RouteHosts := slicePointersToValues(client1Route.Hosts)
 		strClient1RoutePaths := fmt.Sprint(client1RoutePaths)
 
 		for _, client2Route := range allRoutesClient2 {
 
-			if slices.Equal(client1RoutePaths, slicePointersToValues(client2Route.Paths)) {
+			if slices.Equal(client1RoutePaths, slicePointersToValues(client2Route.Paths)) && slices.Equal(client1RouteHosts, slicePointersToValues(client2Route.Hosts)) {
 				result = true
 				//checking route parameters
 				if *client1Route.PreserveHost != *client2Route.PreserveHost {
@@ -76,9 +77,9 @@ func main() {
 				if !slices.Equal(slicePointersToValues(client1Route.Methods), slicePointersToValues(client2Route.Methods)) {
 					log.Printf("Route %v Methods not equals \n", strClient1RoutePaths)
 				}
-				if !slices.Equal(slicePointersToValues(client1Route.Hosts), slicePointersToValues(client2Route.Hosts)) {
-					log.Printf("Route %v Hosts not equals \n", strClient1RoutePaths)
-				}
+				// if !slices.Equal(slicePointersToValues(client1Route.Hosts), slicePointersToValues(client2Route.Hosts)) {
+				// 	log.Printf("Route %v Hosts not equals \n", strClient1RoutePaths)
+				// }
 				if !slices.Equal(slicePointersToValues(client1Route.Protocols), slicePointersToValues(client2Route.Protocols)) {
 					log.Printf("Route %v Protocols not equals \n", strClient1RoutePaths)
 				}
