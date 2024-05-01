@@ -61,7 +61,7 @@ func main() {
 
 		client1RoutePaths := slicePointersToValues(client1Route.Paths)
 		client1RouteHosts := slicePointersToValues(client1Route.Hosts)
-		strClient1RoutePaths := fmt.Sprint(client1RoutePaths)
+		strClient1RoutePaths := fmt.Sprint(client1RouteHosts) + fmt.Sprint(client1RoutePaths)
 
 		for _, client2Route := range allRoutesClient2 {
 
